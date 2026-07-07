@@ -11,13 +11,14 @@ import {
   ChevronRight,
   Zap,
   AlertTriangle,
+  LogOut,
 } from "lucide-react"
 import { schedule as initialSchedule, statusMeta, type Task } from "@/lib/schedule"
 import { TimeChip } from "@/components/time-chip"
 
 type GeneratedTask = { start: string; end: string; title: string; note: string }
 
-export function ChildDashboard() {
+export function ChildDashboard({ onLogout }: { onLogout: () => void }) {
   const [tasks, setTasks] = useState<Task[]>(initialSchedule)
   const [promptOpen, setPromptOpen] = useState(false)
   const [generating, setGenerating] = useState(false)
@@ -72,9 +73,9 @@ export function ChildDashboard() {
   }
 
   return (
-    <div className="relative flex h-full flex-col">
+    <div className="relative flex min-h-dvh flex-col">
       {/* Header */}
-      <header className="px-5 pt-6">
+      <header className="px-5 pt-[max(1.5rem,env(safe-area-inset-top))]">
         <div className="flex items-start justify-between">
           <div>
             <p className="font-mono text-xs text-muted-foreground">
@@ -84,8 +85,17 @@ export function ChildDashboard() {
               Hey, Shidqi
             </h1>
           </div>
-          <div className="flex size-11 items-center justify-center rounded-2xl border border-cyan/40 bg-cyan/10">
-            <Zap className="size-5 text-cyan" />
+          <div className="flex items-center gap-2">
+            <div className="flex size-11 items-center justify-center rounded-2xl border border-cyan/40 bg-cyan/10">
+              <Zap className="size-5 text-cyan" />
+            </div>
+            <button
+              onClick={onLogout}
+              aria-label="Log out"
+              className="flex size-11 items-center justify-center rounded-2xl border border-border bg-elevated text-muted-foreground transition-colors active:scale-95 hover:text-foreground"
+            >
+              <LogOut className="size-5" />
+            </button>
           </div>
         </div>
         <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-border-strong bg-elevated px-3 py-1.5">

@@ -14,6 +14,7 @@ import {
   Target,
   Timer,
   TrendingUp,
+  LogOut,
 } from "lucide-react"
 import {
   schedule,
@@ -26,7 +27,7 @@ import {
 
 type Tab = "feed" | "stats"
 
-export function MotherDashboard() {
+export function MotherDashboard({ onLogout }: { onLogout: () => void }) {
   const [preview, setPreview] = useState<Task | null>(null)
   const [tab, setTab] = useState<Tab>("feed")
 
@@ -39,9 +40,9 @@ export function MotherDashboard() {
   const progress = Math.round((counts.completed / total) * 100)
 
   return (
-    <div className="relative flex h-full flex-col">
+    <div className="relative flex min-h-dvh flex-col">
       {/* Header */}
-      <header className="px-5 pt-6">
+      <header className="px-5 pt-[max(1.5rem,env(safe-area-inset-top))]">
         <div className="flex items-start justify-between">
           <div>
             <p className="font-mono text-xs text-muted-foreground">Monitoring · Senin, 7 Jul</p>
@@ -49,9 +50,18 @@ export function MotherDashboard() {
               Jadwal Shidqi
             </h1>
           </div>
-          <div className="flex items-center gap-2 rounded-full border border-cyan/40 bg-cyan/10 px-3 py-1.5">
-            <span className="size-2 rounded-full bg-cyan pulse-dot" />
-            <span className="font-mono text-xs text-cyan">Real-time</span>
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 rounded-full border border-cyan/40 bg-cyan/10 px-3 py-1.5">
+              <span className="size-2 rounded-full bg-cyan pulse-dot" />
+              <span className="font-mono text-xs text-cyan">Real-time</span>
+            </div>
+            <button
+              onClick={onLogout}
+              aria-label="Log out"
+              className="flex size-9 items-center justify-center rounded-full border border-border bg-elevated text-muted-foreground transition-colors active:scale-95 hover:text-foreground"
+            >
+              <LogOut className="size-4" />
+            </button>
           </div>
         </div>
 
