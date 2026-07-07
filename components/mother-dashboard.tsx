@@ -14,6 +14,9 @@ import {
   Target,
   Timer,
   TrendingUp,
+  LogOut,
+  Settings as SettingsIcon,
+  Sparkles,
 } from "lucide-react"
 import {
   schedule,
@@ -23,10 +26,11 @@ import {
   streakDays,
   type Task,
 } from "@/lib/schedule"
+import { SettingsView } from "@/components/settings-view"
 
-type Tab = "feed" | "stats"
+type Tab = "feed" | "stats" | "settings"
 
-export function MotherDashboard() {
+export function MotherDashboard({ onLogout }: { onLogout: () => void }) {
   const [preview, setPreview] = useState<Task | null>(null)
   const [tab, setTab] = useState<Tab>("feed")
 
@@ -39,9 +43,9 @@ export function MotherDashboard() {
   const progress = Math.round((counts.completed / total) * 100)
 
   return (
-    <div className="relative flex h-full flex-col">
+    <div className="relative flex min-h-dvh flex-col">
       {/* Header */}
-      <header className="px-5 pt-6">
+      <header className="px-5 pt-[max(1.5rem,env(safe-area-inset-top))]">
         <div className="flex items-start justify-between">
           <div>
             <p className="font-mono text-xs text-muted-foreground">Monitoring · Senin, 7 Jul</p>
@@ -49,9 +53,18 @@ export function MotherDashboard() {
               Jadwal Shidqi
             </h1>
           </div>
-          <div className="flex items-center gap-2 rounded-full border border-cyan/40 bg-cyan/10 px-3 py-1.5">
-            <span className="size-2 rounded-full bg-cyan pulse-dot" />
-            <span className="font-mono text-xs text-cyan">Real-time</span>
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 rounded-full border border-cyan/40 bg-cyan/10 px-3 py-1.5">
+              <span className="size-2 rounded-full bg-cyan pulse-dot" />
+              <span className="font-mono text-xs text-cyan">Real-time</span>
+            </div>
+            <button
+              onClick={onLogout}
+              aria-label="Log out"
+              className="flex size-9 items-center justify-center rounded-full border border-border bg-elevated text-muted-foreground transition-colors active:scale-95 hover:text-foreground"
+            >
+              <LogOut className="size-4" />
+            </button>
           </div>
         </div>
 
@@ -91,7 +104,7 @@ export function MotherDashboard() {
             active={tab === "feed"}
             onClick={() => setTab("feed")}
             icon={<Radio className="size-4" />}
-            label="Live Feed"
+            label="Feed"
           />
           <TabButton
             active={tab === "stats"}
@@ -99,14 +112,20 @@ export function MotherDashboard() {
             icon={<BarChart3 className="size-4" />}
             label="Statistik"
           />
+          <TabButton
+            active={tab === "settings"}
+            onClick={() => setTab("settings")}
+            icon={<SettingsIcon className="size-4" />}
+            label="Setelan"
+          />
         </div>
       </div>
 
-      {tab === "feed" ? (
-        <FeedView counts={counts} onPreview={setPreview} />
-      ) : (
+      {tab === "feed" && <FeedView counts={counts} onPreview={setPreview} />}
+      {tab === "stats" && (
         <StatsView completedToday={counts.completed} total={total} progress={progress} />
       )}
+      {tab === "settings" && <SettingsView />}
 
       {/* Image expand modal */}
       {preview?.proofImage && (
@@ -158,7 +177,7 @@ function TabButton({
   return (
     <button
       onClick={onClick}
-      className={`flex flex-1 items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-sm font-bold transition-colors ${
+      className={`flex flex-1 items-center justify-center gap-1.5 rounded-xl px-2 py-2.5 text-[13px] font-bold transition-colors ${
         active
           ? "bg-cyan text-cyan-foreground"
           : "text-muted-foreground hover:text-foreground"
@@ -170,6 +189,37 @@ function TabButton({
   )
 }
 
+function HighlightBanner() {
+  const highlights = [
+    "Shidqi sudah meningkatkan waktu belajarnya sebesar 20% minggu ini.",
+    "Fokus operasional Kopsus Gula Aren berjalan tepat waktu tiga hari beruntun.",
+    "Konsistensi olahraga pagi naik — endurance ride 20km terpenuhi setiap hari.",
+  ]
+  return (
+    <div className="glow-cyan relative overflow-hidden rounded-2xl border border-cyan/40 bg-cyan/10 p-4">
+      <div className="flex items-center gap-2">
+        <div className="flex size-7 items-center justify-center rounded-lg border border-cyan/40 bg-cyan/15">
+          <Sparkles className="size-4 text-cyan" />
+        </div>
+        <span className="font-mono text-xs font-bold uppercase tracking-widest text-cyan">
+          AI Highlight
+        </span>
+      </div>
+      <p className="mt-2.5 text-pretty text-[15px] font-bold leading-snug">
+        {highlights[0]}
+      </p>
+      <ul className="mt-2.5 flex flex-col gap-1.5">
+        {highlights.slice(1).map((h, i) => (
+          <li key={i} className="flex items-start gap-2 text-sm leading-relaxed text-muted-foreground">
+            <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-cyan" />
+            <span className="text-pretty">{h}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
 function FeedView({
   counts,
   onPreview,
@@ -178,7 +228,12 @@ function FeedView({
   onPreview: (t: Task) => void
 }) {
   return (
-    <>
+    <div className="flex flex-1 flex-col overflow-y-auto pb-6">
+      {/* AI-generated highlight summary */}
+      <div className="px-5 pt-4">
+        <HighlightBanner />
+      </div>
+
       {/* Analytics bento */}
       <div className="px-5 pt-4">
         <div className="grid grid-cols-3 gap-3">
@@ -204,7 +259,7 @@ function FeedView({
       </div>
 
       {/* Live feed */}
-      <div className="mt-4 flex-1 overflow-y-auto px-5 pb-6">
+      <div className="mt-4 px-5">
         <div className="mb-3 flex items-center gap-2">
           <Radio className="size-4 text-cyan" />
           <h2 className="text-sm font-bold uppercase tracking-widest text-muted-foreground">
@@ -275,7 +330,7 @@ function FeedView({
           })}
         </ul>
       </div>
-    </>
+    </div>
   )
 }
 
